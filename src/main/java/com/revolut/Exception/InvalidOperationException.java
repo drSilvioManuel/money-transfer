@@ -38,4 +38,12 @@ public class InvalidOperationException  extends WebApplicationException {
                         "The money are not enough to perform operation"),
                 Response.Status.PAYMENT_REQUIRED);
     }
+
+    public static InvalidOperationException createWrongTypeOperationForUpdate() {
+        return new InvalidOperationException(
+                new JsonError(
+                        "Type operation error",
+                        "An operation has to be 0 - deposit or 1 - withdraw"),
+                Response.Status.NOT_ACCEPTABLE);
+    }
 }

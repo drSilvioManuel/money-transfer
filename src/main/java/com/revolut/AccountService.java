@@ -1,5 +1,7 @@
 package com.revolut;
 
+import com.revolut.Exception.InvalidOperationException;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
@@ -34,6 +36,8 @@ public class AccountService {
     @Path("{id}/update")
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response updateAccount(@PathParam("id") int id, Operation operation){
+        if (operation.type != Operation.TYPE.DEPOSIT && operation.type != Operation.TYPE.WITHDRAW)
+            throw InvalidOperationException.createWrongTypeOperationForUpdate();
         balanceManager.buildResponse(new RequestMessage.Update(id, operation)).perform();
         return javax.ws.rs.core.Response.status(javax.ws.rs.core.Response.Status.OK).build();
     }
@@ -42,7 +46,9 @@ public class AccountService {
     @Path("{id}/transfer/{idTo}")
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response depositAccount(@PathParam("id") int from, @PathParam("idTo") int to, Operation operation){
-        balanceManager.buildResponse(new RequestMessage.Transfer(from, to, operation)).perform();
+        balanceManager.buildResponse(
+                new RequestMessage.Transfer(from, to, new Operation(Operation.TYPE.TRANSFER.getId(), operation.money))
+        ).perform();
         return javax.ws.rs.core.Response.status(javax.ws.rs.core.Response.Status.OK).build();
     }
 }
