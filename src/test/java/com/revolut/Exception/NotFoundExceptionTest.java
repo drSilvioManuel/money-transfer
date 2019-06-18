@@ -1,6 +1,6 @@
-package com.remolut.Exception;
+package com.revolut.Exception;
 
-import com.remolut.JsonError;
+import com.revolut.JsonError;
 import org.junit.Test;
 
 import javax.ws.rs.core.Response;

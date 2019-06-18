@@ -1,8 +1,8 @@
-package com.remolut;
+package com.revolut;
 
 import com.google.common.util.concurrent.AtomicDouble;
-import com.remolut.Exception.InvalidOperationException;
-import com.remolut.Exception.NotFoundException;
+import com.revolut.Exception.InvalidOperationException;
+import com.revolut.Exception.NotFoundException;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.Collections;

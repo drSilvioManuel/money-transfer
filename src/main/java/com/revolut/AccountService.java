@@ -1,4 +1,4 @@
-package com.remolut;
+package com.revolut;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;

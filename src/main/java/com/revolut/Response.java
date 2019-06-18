@@ -1,4 +1,4 @@
-package com.remolut;
+package com.revolut;
 
 @FunctionalInterface
 public interface Response {

@@ -1,4 +1,4 @@
-package com.remolut;
+package com.revolut;
 
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.junit.After;

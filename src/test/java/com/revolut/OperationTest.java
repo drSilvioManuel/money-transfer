@@ -1,6 +1,6 @@
-package com.remolut;
+package com.revolut;
 
-import com.remolut.Exception.InvalidOperationException;
+import com.revolut.Exception.InvalidOperationException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

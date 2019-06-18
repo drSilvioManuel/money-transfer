@@ -1,6 +1,6 @@
-package com.remolut.Exception;
+package com.revolut.Exception;
 
-import com.remolut.JsonError;
+import com.revolut.JsonError;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;

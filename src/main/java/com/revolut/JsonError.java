@@ -1,4 +1,4 @@
-package com.remolut;
+package com.revolut;
 
 import jdk.nashorn.internal.ir.annotations.Immutable;
 

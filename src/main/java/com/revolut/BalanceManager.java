@@ -1,6 +1,6 @@
-package com.remolut;
+package com.revolut;
 
-import com.remolut.Exception.InvalidOperationException;
+import com.revolut.Exception.InvalidOperationException;
 
 import javax.annotation.concurrent.ThreadSafe;
 
