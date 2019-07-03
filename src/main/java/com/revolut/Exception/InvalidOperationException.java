@@ -46,4 +46,12 @@ public class InvalidOperationException  extends WebApplicationException {
                         "An operation has to be 0 - deposit or 1 - withdraw"),
                 Response.Status.NOT_ACCEPTABLE);
     }
+
+    public static InvalidOperationException createOptimisticLock() {
+        return new InvalidOperationException(
+                new JsonError(
+                        "The operations error",
+                        "The balance of account to withdraw was changed before operation, try again."),
+                Response.Status.TOO_MANY_REQUESTS);
+    }
 }

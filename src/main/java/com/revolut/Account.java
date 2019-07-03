@@ -73,7 +73,8 @@ public class Account {
         double currentBalance = balance.doubleValue();
         throwIfBalanceLessThanWithdraw(amount, currentBalance);
 
-        balance.compareAndSet(currentBalance, currentBalance - amount);
+        if ( ! balance.compareAndSet(currentBalance, currentBalance - amount))
+            throw InvalidOperationException.createOptimisticLock();
     }
 
     private void throwIfBalanceLessThanWithdraw(double amount, double currentBalance) {
