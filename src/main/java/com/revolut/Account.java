@@ -70,14 +70,14 @@ public class Account {
     public void withdraw(double amount) {
         throwIfAmountNegative(amount);
 
-        synchronized (this) {
-             throwIfBalanceLessThanWithdraw(amount);
-             balance.getAndAdd(-amount);
-        }
+        double currentBalance = balance.doubleValue();
+        throwIfBalanceLessThanWithdraw(amount, currentBalance);
+
+        balance.compareAndSet(currentBalance, currentBalance - amount);
     }
 
-    private void throwIfBalanceLessThanWithdraw(double amount) {
-        if (amount > balance.doubleValue()) throw InvalidOperationException.createDepositBalanceLessThanWithdraw();
+    private void throwIfBalanceLessThanWithdraw(double amount, double currentBalance) {
+        if (amount > currentBalance) throw InvalidOperationException.createDepositBalanceLessThanWithdraw();
     }
 
     private void throwIfAmountNegative(double amount) {
