@@ -6,8 +6,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.Optional;
-
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertSame;
@@ -34,17 +32,17 @@ public class AccountTest {
     public void checkConsistencyBalanceInterface() {
         Account account = new Account(2000f);
 
-        account.deposit(1000, Optional.empty());
+        account.deposit(1000);
 
         assertEquals("deposit value check", (double) 2000+1000, account.getBalance());
 
-        account.withdraw(2999.99f, Optional.empty());
+        account.withdraw(2999.99f);
 
         double delta = 0.001;
         assertEquals("withdraw successful", 0.01, account.getBalance(), delta);
 
         exception.expect(InvalidOperationException.class);
-        account.withdraw(0.02f, Optional.empty());
+        account.withdraw(0.02f);
         assertEquals("withdraw failed", 0.01, account.getBalance(), delta);
     }
 
@@ -53,7 +51,7 @@ public class AccountTest {
         Account account = new Account(-2000);
 
         exception.expect(InvalidOperationException.class);
-        account.withdraw(-3000, Optional.empty());
+        account.withdraw(-3000);
     }
 
     @Test
@@ -61,7 +59,7 @@ public class AccountTest {
         Account account = new Account(-2000);
 
         exception.expect(InvalidOperationException.class);
-        account.withdraw(0.02f, Optional.empty());
+        account.withdraw(0.02f);
     }
 
     @Test
@@ -69,7 +67,7 @@ public class AccountTest {
         Account account = new Account(1000);
 
         exception.expect(InvalidOperationException.class);
-        account.deposit(-0.02f, Optional.empty());
+        account.deposit(-0.02f);
     }
 
     @Test

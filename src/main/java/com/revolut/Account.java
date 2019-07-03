@@ -5,11 +5,9 @@ import com.revolut.Exception.InvalidOperationException;
 import com.revolut.Exception.NotFoundException;
 
 import javax.annotation.concurrent.ThreadSafe;
-import java.beans.Transient;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -18,6 +16,7 @@ public class Account {
 
     private static final AtomicInteger counter = new AtomicInteger();
     private static final CopyOnWriteArrayList<Account> mockAccountList = new CopyOnWriteArrayList<>();
+
 
     static {
         new Account(100);
@@ -29,7 +28,6 @@ public class Account {
         new Account(400);
     }
 
-    private final AtomicInteger version = new AtomicInteger();
     private final int id;
     private AtomicDouble balance;
 
@@ -63,26 +61,17 @@ public class Account {
         return mockAccountList.get(id);
     }
 
-    public void deposit(double amount, Optional<Integer> v) {
-        version.getAndIncrement();
-        v.ifPresent(w -> throwIfVersionsFailed(version.get(), w));
+    public void deposit(double amount) {
         throwIfAmountNegative(amount);
 
         balance.getAndAdd(amount);
     }
 
-    public void withdraw(double amount, Optional<Integer> v) {
-        version.getAndIncrement();
-        v.ifPresent(w -> throwIfVersionsFailed(version.get(), w));
+    public void withdraw(double amount) {
         throwIfAmountNegative(amount);
         throwIfBalanceLessThanWithdraw(amount);
 
         balance.getAndAdd(-amount);
-    }
-
-    @Transient
-    public int getVersion() {
-        return version.get();
     }
 
     private void throwIfBalanceLessThanWithdraw(double amount) {
@@ -91,10 +80,6 @@ public class Account {
 
     private void throwIfAmountNegative(double amount) {
         if (amount < 0) throw InvalidOperationException.createDepositNegativeAmount();
-    }
-
-    private void throwIfVersionsFailed(int v1, int v2) {
-        if ((v1 - v2) != 1) throw InvalidOperationException.createOptimisticLock();
     }
 
     @Override

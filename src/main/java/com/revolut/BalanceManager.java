@@ -3,7 +3,6 @@ package com.revolut;
 import com.revolut.Exception.InvalidOperationException;
 
 import javax.annotation.concurrent.ThreadSafe;
-import java.util.Optional;
 
 @ThreadSafe
 public class BalanceManager {
@@ -13,18 +12,17 @@ public class BalanceManager {
         Response response;
         switch (message.getOperation().type) {
             case DEPOSIT:
-                response = () -> from.deposit(message.getOperation().money, Optional.empty());
+                response = () -> from.deposit(message.getOperation().money);
                 break;
             case WITHDRAW:
-                response = () -> from.withdraw(message.getOperation().money, Optional.empty());
+                response = () -> from.withdraw(message.getOperation().money);
                 break;
             case TRANSFER:
                 Account to = Account.getById(((RequestMessage.Transfer) message).getIdTo());
 
                 response = () -> {
-                    Optional<Integer> toVersion = Optional.of(to.getVersion());
-                    from.withdraw(message.getOperation().money, Optional.of(from.getVersion()));
-                    to.deposit(message.getOperation().money, toVersion);
+                    from.withdraw(message.getOperation().money);
+                    to.deposit(message.getOperation().money);
                 };
                 break;
             default:
