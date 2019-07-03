@@ -69,9 +69,11 @@ public class Account {
 
     public void withdraw(double amount) {
         throwIfAmountNegative(amount);
-        throwIfBalanceLessThanWithdraw(amount);
 
-        balance.getAndAdd(-amount);
+        synchronized (this) {
+             throwIfBalanceLessThanWithdraw(amount);
+             balance.getAndAdd(-amount);
+        }
     }
 
     private void throwIfBalanceLessThanWithdraw(double amount) {
