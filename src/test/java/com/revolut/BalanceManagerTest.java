@@ -10,14 +10,13 @@ import static junit.framework.TestCase.assertEquals;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class BalanceManagerTest {
 
-    private final BalanceManager balanceManager = new BalanceManager();
     private final int from = 5;
     private final int to = 6;
 
     @Test
     public void checkLazyEvaluationForDeposit() {
         assertEquals(300.0, AccountManager.getBalance(from));
-        Response response = balanceManager.buildResponse(new RequestMessage.Update(from, new Operation(Operation.TYPE.DEPOSIT.getId(), 100.0)));
+        Response response = BalanceManager.buildDepositResponse(from, 100.0);
 
         assertEquals(300.0, AccountManager.getBalance(from));
 
@@ -29,7 +28,7 @@ public class BalanceManagerTest {
     public void checkWithdraw() {
         assertEquals(350.0, AccountManager.getBalance(from));
 
-        balanceManager.buildResponse(new RequestMessage.Update(from, new Operation(Operation.TYPE.WITHDRAW.getId(), 100.0))).perform();
+        BalanceManager.buildWithdrawResponse(from, 100.0).perform();
 
         assertEquals(250.0, AccountManager.getBalance(from));
     }
@@ -39,7 +38,7 @@ public class BalanceManagerTest {
         assertEquals(400.0, AccountManager.getBalance(from));
         assertEquals(400.0, AccountManager.getBalance(to));
 
-        balanceManager.buildResponse(new RequestMessage.Transfer(from, to, new Operation(Operation.TYPE.TRANSFER.getId(), 50.0))).perform();
+        BalanceManager.buildTransferResponse(from, to, 50.0).perform();
 
         assertEquals(350.0, AccountManager.getBalance(from));
         assertEquals(450.0, AccountManager.getBalance(to));
@@ -47,11 +46,6 @@ public class BalanceManagerTest {
 
     @Test(expected = InvalidOperationException.class)
     public void checkFail() {
-        balanceManager.buildResponse(new RequestMessage.Transfer(from, to, new Operation(Operation.TYPE.TRANSFER.getId(), 500.0))).perform();
-    }
-
-    @Test(expected = InvalidOperationException.class)
-    public void checkFail2() {
-        balanceManager.buildResponse(new RequestMessage.Transfer(from, to, new Operation(Operation.TYPE.NONE.getId(), 500.0))).perform();
+        BalanceManager.buildTransferResponse(from, to, 500.0).perform();
     }
 }

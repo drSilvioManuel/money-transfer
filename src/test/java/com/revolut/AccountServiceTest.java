@@ -47,13 +47,13 @@ public class AccountServiceTest {
 
     @Test
     public void checkGetById() {
-        String responseMsg = getMessage("accounts/2").get(String.class);
+        String responseMsg = getMessage("account/2").get(String.class);
         assertEquals("{\"id\":2,\"balance\":1000.0}", responseMsg);
     }
 
     @Test
     public void checkGetByWrongId() throws ExecutionException, InterruptedException {
-        Invocation.Builder builder = getMessage("accounts/222");
+        Invocation.Builder builder = getMessage("account/222");
         Invocation invocation = builder.buildGet();
         Future<javax.ws.rs.core.Response> responseFuture = invocation.submit();
         javax.ws.rs.core.Response response = responseFuture.get();
@@ -63,8 +63,8 @@ public class AccountServiceTest {
 
     @Test
     public void checkAddingAccount() throws ExecutionException, InterruptedException {
-        Invocation.Builder builder = getMessage("accounts/add");
-        Invocation invocation = builder.buildPost(Entity.json(new Operation(4, 177)));
+        Invocation.Builder builder = getMessage("account");
+        Invocation invocation = builder.buildPost(Entity.json(new Operation(177)));
         Future<javax.ws.rs.core.Response> responseFuture = invocation.submit();
         javax.ws.rs.core.Response response = responseFuture.get();
 
@@ -73,58 +73,58 @@ public class AccountServiceTest {
 
     @Test
     public void checkDepositAccount() throws ExecutionException, InterruptedException {
-        String responseMsg = getMessage("accounts/3").get(String.class);
+        String responseMsg = getMessage("account/3").get(String.class);
         assertEquals("{\"id\":3,\"balance\":1200.0}", responseMsg);
 
-        Invocation.Builder builder = getMessage("accounts/3/update");
-        Invocation invocation = builder.buildPut(Entity.json(new Operation(1, 177)));
+        Invocation.Builder builder = getMessage("account/deposit/3");
+        Invocation invocation = builder.buildPut(Entity.json(new Operation(177)));
         Future<javax.ws.rs.core.Response> responseFuture = invocation.submit();
         javax.ws.rs.core.Response response = responseFuture.get();
         System.out.println(response);
 
         assertEquals(200, response.getStatus());
 
-        responseMsg = getMessage("accounts/3").get(String.class);
+        responseMsg = getMessage("account/3").get(String.class);
         assertEquals("{\"id\":3,\"balance\":1377.0}", responseMsg);
     }
 
     @Test
     public void checkWithdrawAccount() throws ExecutionException, InterruptedException {
-        String responseMsg = getMessage("accounts/3").get(String.class);
+        String responseMsg = getMessage("account/3").get(String.class);
         assertEquals("{\"id\":3,\"balance\":1377.0}", responseMsg);
 
-        Invocation.Builder builder = getMessage("accounts/3/update");
-        Invocation invocation = builder.buildPut(Entity.json(new Operation(2, 177)));
+        Invocation.Builder builder = getMessage("account/withdraw/3");
+        Invocation invocation = builder.buildPut(Entity.json(new Operation(177)));
         Future<javax.ws.rs.core.Response> responseFuture = invocation.submit();
         javax.ws.rs.core.Response response = responseFuture.get();
         System.out.println(response);
 
         assertEquals(200, response.getStatus());
 
-        responseMsg = getMessage("accounts/3").get(String.class);
+        responseMsg = getMessage("account/3").get(String.class);
         assertEquals("{\"id\":3,\"balance\":1200.0}", responseMsg);
     }
 
     @Test
     public void checkTransfer() throws ExecutionException, InterruptedException {
-        String responseMsg = getMessage("accounts/1").get(String.class);
+        String responseMsg = getMessage("account/1").get(String.class);
         assertEquals("{\"id\":1,\"balance\":119.0}", responseMsg);
 
-        responseMsg = getMessage("accounts/2").get(String.class);
+        responseMsg = getMessage("account/2").get(String.class);
         assertEquals("{\"id\":2,\"balance\":1000.0}", responseMsg);
 
-        Invocation.Builder builder = getMessage("accounts/1/transfer/2");
-        Invocation invocation = builder.buildPut(Entity.json(new Operation(3, 19)));
+        Invocation.Builder builder = getMessage("account/transfer/1/2");
+        Invocation invocation = builder.buildPut(Entity.json(new Operation(19)));
         Future<javax.ws.rs.core.Response> responseFuture = invocation.submit();
         javax.ws.rs.core.Response response = responseFuture.get();
         System.out.println(response);
 
         assertEquals(200, response.getStatus());
 
-        responseMsg = getMessage("accounts/1").get(String.class);
+        responseMsg = getMessage("account/1").get(String.class);
         assertEquals("{\"id\":1,\"balance\":100.0}", responseMsg);
 
-        responseMsg = getMessage("accounts/2").get(String.class);
+        responseMsg = getMessage("account/2").get(String.class);
         assertEquals("{\"id\":2,\"balance\":1019.0}", responseMsg);
     }
 

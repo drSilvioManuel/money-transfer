@@ -19,14 +19,14 @@ mvn clean compile
 mvn exec:java
 
 # add account
-curl -X POST -i -H "Content-Type: application/json" -d '{"type":3,"money":125.8}' http://localhost:8080/v1/accounts/add
+curl -X POST -i -H "Content-Type: application/json" -d '{"money":125.8}' http://localhost:8080/v1/account
 
 # deposit account
-curl -X PUT -i -H "Content-Type: application/json" -d '{"type":0,"money":70}' http://localhost:8080/v1/accounts/3/update
+curl -X PUT -i -H "Content-Type: application/json" -d '{"money":70}' http://localhost:8080/v1/account/deposit/3
 
 # withdraw account
-curl -X PUT -i -H "Content-Type: application/json" -d '{"type":1,"money":10}' http://localhost:8080/v1/accounts/3/update
+curl -X PUT -i -H "Content-Type: application/json" -d '{"money":10}' http://localhost:8080/v1/account/withdraw/3
 
 # transfer money from one account to another
-curl -X PUT -i -H "Content-Type: application/json" -d '{"type":2,"money":10}' http://localhost:8080/v1/accounts/4/transfer/6
+curl -X PUT -i -H "Content-Type: application/json" -d '{"money":10}' http://localhost:8080/v1/account/transfer/4/6
 ```

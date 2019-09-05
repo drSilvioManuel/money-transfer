@@ -7,54 +7,19 @@ import java.util.Objects;
 
 @Immutable
 public class Operation {
-    enum TYPE {
-        DEPOSIT(1),
-        WITHDRAW(2),
-        TRANSFER(3),
-        NONE(4);
 
-        private int id;
-
-        TYPE(int id) {
-            this.id = id;
-        }
-
-        TYPE getType(int id) {
-            for(TYPE e: TYPE.values()) {
-                if(e.id == id) {
-                    return e;
-                }
-            }
-            return NONE;
-        }
-
-        public int getId() {
-            return id;
-        }
-    }
-
-    final TYPE type;
     final double money;
 
-    private Operation(TYPE t, double m) {
+    public Operation(double m) {
         if (m < 0) throw new InvalidOperationException(
                 new JsonError(
                         "Operation error",
                         "The money amount has to be positive value"));
-        type = t;
         money = m;
     }
 
-    public Operation(int t, double m) {
-        this(TYPE.NONE.getType(t), m);
-    }
-
     Operation() {
-        this(TYPE.NONE, 0);
-    }
-
-    public TYPE getType() {
-        return type;
+        this(0);
     }
 
     public double getMoney() {
@@ -66,13 +31,12 @@ public class Operation {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Operation operation = (Operation) o;
-        return Double.compare(operation.money, money) == 0 &&
-                type == operation.type;
+        return Double.compare(operation.money, money) == 0;
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(type, money);
+        return Objects.hash(money);
     }
 }

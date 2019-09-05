@@ -5,17 +5,8 @@ import com.revolut.Exception.InvalidOperationException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
-@Path("/accounts")
+@Path("/account")
 public class AccountService {
-
-    private final BalanceManager balanceManager = new BalanceManager();
-
-    @GET
-    @Path("/all")
-    @Produces(MediaType.APPLICATION_JSON)
-    public AccountManager.ImmutableAccount[] getAllAccounts() {
-        return AccountManager.getMockAccountList().toArray(new AccountManager.ImmutableAccount[0]);
-    }
 
     @GET
     @Path("{id}")
@@ -25,7 +16,7 @@ public class AccountService {
     }
 
     @POST
-    @Path("add")
+    @Path("")
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response addAccount(Operation operation){
         AccountManager.addAccount(operation.money);
@@ -33,22 +24,28 @@ public class AccountService {
     }
 
     @PUT
-    @Path("{id}/update")
+    @Path("deposit/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public javax.ws.rs.core.Response updateAccount(@PathParam("id") int id, Operation operation){
-        if (operation.type != Operation.TYPE.DEPOSIT && operation.type != Operation.TYPE.WITHDRAW)
-            throw InvalidOperationException.createWrongTypeOperationForUpdate();
-        balanceManager.buildResponse(new RequestMessage.Update(id, operation)).perform();
+    public javax.ws.rs.core.Response depositAccount(@PathParam("id") int id, Operation operation){
+
+        BalanceManager.buildDepositResponse(id, operation.getMoney()).perform();
         return javax.ws.rs.core.Response.status(javax.ws.rs.core.Response.Status.OK).build();
     }
 
     @PUT
-    @Path("{id}/transfer/{idTo}")
+    @Path("withdraw/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public javax.ws.rs.core.Response depositAccount(@PathParam("id") int from, @PathParam("idTo") int to, Operation operation){
-        balanceManager.buildResponse(
-                new RequestMessage.Transfer(from, to, new Operation(Operation.TYPE.TRANSFER.getId(), operation.money))
-        ).perform();
+    public javax.ws.rs.core.Response withdrawAccount(@PathParam("id") int id, Operation operation){
+
+        BalanceManager.buildWithdrawResponse(id, operation.getMoney()).perform();
+        return javax.ws.rs.core.Response.status(javax.ws.rs.core.Response.Status.OK).build();
+    }
+
+    @PUT
+    @Path("transfer/{from}/{to}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public javax.ws.rs.core.Response depositAccount(@PathParam("from") int from, @PathParam("to") int to, Operation operation){
+        BalanceManager.buildTransferResponse(from, to, operation.getMoney()).perform();
         return javax.ws.rs.core.Response.status(javax.ws.rs.core.Response.Status.OK).build();
     }
 }
