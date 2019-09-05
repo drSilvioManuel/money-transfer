@@ -17,78 +17,75 @@ public class AccountTest {
 
     @Test
     public void checkConsistencyGeneralInterface() {
-        Account account = new Account(1e+10);
 
-        int initialId = account.getId();
-        assertEquals("balance check 1", 1e+10, account.getBalance());
+        int initialId = AccountManager.addAccount(1e+10);
+        assertEquals("balance check 1", 1e+10, AccountManager.getBalance(initialId));
 
-        account = new Account(2e+10);
-        assertEquals("id check 2", initialId+1, account.getId());
-        assertEquals("balance check 2", 2e+10, account.getBalance());
-        assertSame("index check", account, Account.getById(account.getId()));
+        int nextId = AccountManager.addAccount(2e+10);
+        assertEquals("id check 2", initialId+1, nextId);
+        assertEquals("balance check 2", 2e+10, AccountManager.getBalance(nextId));
     }
 
     @Test
     public void checkConsistencyBalanceInterface() {
-        Account account = new Account(2000f);
+        int account = AccountManager.addAccount(2000f);
 
-        account.deposit(1000);
+        AccountManager.deposit(account,1000);
 
-        assertEquals("deposit value check", (double) 2000+1000, account.getBalance());
+        assertEquals("deposit value check", (double) 2000+1000, AccountManager.getBalance(account));
 
-        account.withdraw(2999.99f);
+        AccountManager.withdraw(account, 2999.99f);
 
         double delta = 0.001;
-        assertEquals("withdraw successful", 0.01, account.getBalance(), delta);
+        assertEquals("withdraw successful", 0.01, AccountManager.getBalance(account), delta);
 
         exception.expect(InvalidOperationException.class);
-        account.withdraw(0.02f);
-        assertEquals("withdraw failed", 0.01, account.getBalance(), delta);
+        AccountManager.withdraw(account, 0.02f);
+        assertEquals("withdraw failed", 0.01, AccountManager.getBalance(account), delta);
     }
 
     @Test
     public void checkWithdrawNegativeWithNegativeBalance() {
-        Account account = new Account(-2000);
+        int account = AccountManager.addAccount(-2000);
 
         exception.expect(InvalidOperationException.class);
-        account.withdraw(-3000);
+        AccountManager.withdraw(account, -3000);
     }
 
     @Test
     public void checkWithdrawWithNegativeBalance() {
-        Account account = new Account(-2000);
+        int account = AccountManager.addAccount(-2000);
 
         exception.expect(InvalidOperationException.class);
-        account.withdraw(0.02f);
+        AccountManager.withdraw(account, 0.02f);
     }
 
     @Test
     public void checkDepositWithNegativeValue() {
-        Account account = new Account(1000);
+        int account = AccountManager.addAccount(1000);
 
         exception.expect(InvalidOperationException.class);
-        account.deposit(-0.02f);
+        AccountManager.deposit(account, -0.02f);
     }
 
     @Test
     public void checkWrongId() {
         exception.expect(NotFoundException.class);
-        Account.getById(Account.getMockAccountList().size());
+        AccountManager.getById(AccountManager.getMockAccountList().size());
     }
 
     @Test
     public void checkWrongNegativeId() {
         exception.expect(NotFoundException.class);
-        Account.getById(-1);
+        AccountManager.getById(-1);
     }
 
     @Test
     public void checkHashAndEquality() {
-        assertEquals(Account.getById(3), Account.getById(3));
-        assertEquals(Account.getById(3).hashCode(), Account.getById(3).hashCode());
+        assertEquals(AccountManager.getById(3), AccountManager.getById(3));
+        assertEquals(AccountManager.getById(3).hashCode(), AccountManager.getById(3).hashCode());
 
-        assertNotEquals(new Account(888), new Account(888));
-        assertNotEquals(new Account(888).hashCode(), new Account(888).hashCode());
+        assertNotEquals(AccountManager.getAccount(AccountManager.addAccount(888)), AccountManager.getAccount(AccountManager.addAccount(888)));
     }
 }
 

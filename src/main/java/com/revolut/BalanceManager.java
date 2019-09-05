@@ -8,22 +8,28 @@ import javax.annotation.concurrent.ThreadSafe;
 public class BalanceManager {
 
     public Response buildResponse(RequestMessage.General message) {
-        Account from = Account.getById(message.getId());
         Response response;
         switch (message.getOperation().type) {
             case DEPOSIT:
-                response = () -> from.deposit(message.getOperation().money);
+                response = () ->
+                        AccountManager.deposit(
+                                message.getId(),
+                                message.getOperation().money);
                 break;
             case WITHDRAW:
-                response = () -> from.withdraw(message.getOperation().money);
+                response = () ->
+                        AccountManager.withdraw(
+                                message.getId(),
+                                message.getOperation().money);
                 break;
             case TRANSFER:
-                Account to = Account.getById(((RequestMessage.Transfer) message).getIdTo());
+                RequestMessage.Transfer extendedMessage = (RequestMessage.Transfer) message;
 
-                response = () -> {
-                    from.withdraw(message.getOperation().money);
-                    to.deposit(message.getOperation().money);
-                };
+                response = () ->
+                        AccountManager.transfer(
+                                extendedMessage.getId(),
+                                extendedMessage.getIdTo(),
+                                extendedMessage.getOperation().money);
                 break;
             default:
                 response = () -> {

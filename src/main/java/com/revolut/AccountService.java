@@ -13,22 +13,22 @@ public class AccountService {
     @GET
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
-    public Account[] getAllAccounts() {
-        return Account.getMockAccountList().toArray(new Account[0]);
+    public AccountManager.ImmutableAccount[] getAllAccounts() {
+        return AccountManager.getMockAccountList().toArray(new AccountManager.ImmutableAccount[0]);
     }
 
     @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Account getAccount(@PathParam("id") int id) {
-        return Account.getById(id);
+    public AccountManager.ImmutableAccount getAccount(@PathParam("id") int id) {
+        return AccountManager.getAccount(id);
     }
 
     @POST
     @Path("add")
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response addAccount(Operation operation){
-        new Account(operation.money);
+        AccountManager.addAccount(operation.money);
         return javax.ws.rs.core.Response.status(201).build();
     }
 
