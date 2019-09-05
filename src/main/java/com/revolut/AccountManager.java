@@ -72,10 +72,21 @@ public class AccountManager {
     }
 
     public static void transfer(int idFrom, int idTo, double amount) {
+        ImmutableAccount from = null;
+        ImmutableAccount to = null;
         long stamp = LOCK.writeLock();
         try {
-            AccountManager.getById(idFrom).account.withdraw(amount);
-            AccountManager.getById(idTo).account.deposit(amount);
+            from = AccountManager.getAccount(idFrom);
+            to = AccountManager.getAccount(idTo);
+
+            from.getAccount().withdraw(amount);
+            to.getAccount().deposit(amount);
+        } catch (InvalidOperationException e) {
+            if (from != null && to != null) {
+                from.resetBalance();
+                to.resetBalance();
+            }
+            throw e;
         } finally {
             LOCK.unlockWrite(stamp);
         }
@@ -101,11 +112,13 @@ public class AccountManager {
 
     public static class ImmutableAccount {
         private final int id;
-        private double balance;
+        private final double balance;
+        private final Account account;
 
         private ImmutableAccount(Account account) {
             this.id = account.getId();
             this.balance = account.getBalance();
+            this.account = account;
         }
 
         public int getId() {
@@ -114,6 +127,10 @@ public class AccountManager {
 
         public double getBalance() {
             return balance;
+        }
+
+        public void resetBalance() {
+            account.setBalance(balance);
         }
 
         @Override
@@ -128,6 +145,10 @@ public class AccountManager {
         @Override
         public int hashCode() {
             return Objects.hash(getId(), getBalance());
+        }
+
+        private Account getAccount() {
+            return account;
         }
     }
 
@@ -152,6 +173,10 @@ public class AccountManager {
 
         private double getBalance() {
             return balance;
+        }
+
+        private void setBalance(double amount) {
+            balance = amount;
         }
 
         private void deposit(double amount) {
