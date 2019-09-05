@@ -82,10 +82,10 @@ public class AccountManager {
             from.getAccount().withdraw(amount);
             to.getAccount().deposit(amount);
         } catch (InvalidOperationException e) {
-            if (from != null && to != null) {
-                from.resetBalance();
-                to.resetBalance();
-            }
+            
+            if (from != null) from.resetBalance();
+            if (to != null) to.resetBalance();
+
             throw e;
         } finally {
             LOCK.unlockWrite(stamp);
