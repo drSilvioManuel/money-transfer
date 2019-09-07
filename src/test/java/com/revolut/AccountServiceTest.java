@@ -1,5 +1,6 @@
 package com.revolut;
 
+import com.revolut.Exception.InvalidOperationException;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.junit.After;
 import org.junit.Before;
@@ -126,6 +127,29 @@ public class AccountServiceTest {
 
         responseMsg = getMessage("account/2").get(String.class);
         assertEquals("{\"id\":2,\"balance\":1019.0}", responseMsg);
+    }
+
+    @Test
+    public void checkTransferFailed() throws ExecutionException, InterruptedException {
+        String responseMsg = getMessage("account/1").get(String.class);
+        assertEquals("{\"id\":1,\"balance\":119.0}", responseMsg);
+
+        responseMsg = getMessage("account/2").get(String.class);
+        assertEquals("{\"id\":2,\"balance\":1000.0}", responseMsg);
+
+        Invocation.Builder builder = getMessage("account/transfer/1/2");
+        Invocation invocation = builder.buildPut(Entity.json(new Operation(120)));
+        Future<javax.ws.rs.core.Response> responseFuture = invocation.submit();
+        javax.ws.rs.core.Response response = responseFuture.get();
+        System.out.println(response);
+
+        assertEquals(402, response.getStatus());
+
+        responseMsg = getMessage("account/1").get(String.class);
+        assertEquals("{\"id\":1,\"balance\":119.0}", responseMsg);
+
+        responseMsg = getMessage("account/2").get(String.class);
+        assertEquals("{\"id\":2,\"balance\":1000.0}", responseMsg);
     }
 
     private Invocation.Builder getMessage(String path) {

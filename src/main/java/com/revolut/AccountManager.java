@@ -3,6 +3,7 @@ package com.revolut;
 import com.revolut.Exception.InvalidOperationException;
 import com.revolut.Exception.NotFoundException;
 
+import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.Collections;
 import java.util.List;
@@ -71,7 +72,7 @@ public class AccountManager {
     public static void transfer(int idFrom, int idTo, double amount) {
         ImmutableAccount from = AccountManager.getById(idFrom);
         ImmutableAccount to = AccountManager.getById(idTo);
-        
+
         long stamp = LOCK.writeLock();
         try {
             from.getAccount().withdraw(amount);
@@ -103,6 +104,7 @@ public class AccountManager {
         return new ImmutableAccount(mockAccountList.get(id));
     }
 
+    @Immutable
     public static class ImmutableAccount {
         private final int id;
         private final double balance;
