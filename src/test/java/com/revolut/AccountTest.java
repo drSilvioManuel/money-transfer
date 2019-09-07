@@ -85,7 +85,7 @@ public class AccountTest {
         assertEquals(AccountManager.getById(3), AccountManager.getById(3));
         assertEquals(AccountManager.getById(3).hashCode(), AccountManager.getById(3).hashCode());
 
-        assertNotEquals(AccountManager.getAccount(AccountManager.addAccount(888)), AccountManager.getAccount(AccountManager.addAccount(888)));
+        assertNotEquals(AccountManager.getById(AccountManager.addAccount(888)), AccountManager.getById(AccountManager.addAccount(888)));
     }
 }
 

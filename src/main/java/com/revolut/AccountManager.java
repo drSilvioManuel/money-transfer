@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class AccountManager {
 
     private static final AtomicInteger counter = new AtomicInteger();
-    private static final CopyOnWriteArrayList<AccountManager> mockAccountList = new CopyOnWriteArrayList<>();
+    private static final CopyOnWriteArrayList<Account> mockAccountList = new CopyOnWriteArrayList<>();
     private static final StampedLock LOCK = new StampedLock();
 
     static {
@@ -29,11 +29,7 @@ public class AccountManager {
         new Account(400);
     }
 
-    private Account account;
-
-    private AccountManager(Account account) {
-        this.account = account;
-    }
+    private AccountManager() {}
 
     public static int addAccount(double balance) {
         return new Account(balance).getId();
@@ -41,22 +37,23 @@ public class AccountManager {
 
     public static double getBalance(int id) {
         long stamp = LOCK.tryOptimisticRead();
-        double balance = AccountManager.getById(id).account.balance;
-        if (!LOCK.validate(stamp)) {
+        double balance = AccountManager.getById(id).getAccount().getBalance();
+        if (LOCK.validate(stamp)) {
+            return balance;
+        } else {
             stamp = LOCK.readLock();
             try {
-                balance = AccountManager.getById(id).account.balance;
+                return AccountManager.getById(id).getAccount().getBalance();
             } finally {
                 LOCK.unlockRead(stamp);
             }
         }
-        return balance;
     }
 
     public static void deposit(int id, double amount) {
         long stamp = LOCK.writeLock();
         try {
-            AccountManager.getById(id).account.deposit(amount);
+            AccountManager.getById(id).getAccount().deposit(amount);
         } finally {
             LOCK.unlockWrite(stamp);
         }
@@ -65,26 +62,25 @@ public class AccountManager {
     public static void withdraw(int id, double amount) {
         long stamp = LOCK.writeLock();
         try {
-            AccountManager.getById(id).account.withdraw(amount);
+            AccountManager.getById(id).getAccount().withdraw(amount);
         } finally {
             LOCK.unlockWrite(stamp);
         }
     }
 
     public static void transfer(int idFrom, int idTo, double amount) {
-        ImmutableAccount from = null;
-        ImmutableAccount to = null;
+        ImmutableAccount from = AccountManager.getById(idFrom);
+        ImmutableAccount to = AccountManager.getById(idTo);
+        
         long stamp = LOCK.writeLock();
         try {
-            from = AccountManager.getAccount(idFrom);
-            to = AccountManager.getAccount(idTo);
-
             from.getAccount().withdraw(amount);
             to.getAccount().deposit(amount);
+
         } catch (InvalidOperationException e) {
             
-            if (from != null) from.resetBalance();
-            if (to != null) to.resetBalance();
+            from.resetBalance();
+            to.resetBalance();
 
             throw e;
         } finally {
@@ -92,22 +88,19 @@ public class AccountManager {
         }
     }
 
-    public static ImmutableAccount getAccount(int id) {
-        return new ImmutableAccount(getById(id).account);
-    }
-
     public static List<ImmutableAccount> getMockAccountList() {
         return Collections.unmodifiableList(
-                mockAccountList.stream()
-                        .map(e -> new ImmutableAccount(e.account))
+                mockAccountList
+                        .stream()
+                        .map(ImmutableAccount::new)
                         .collect(Collectors.toList()));
     }
 
-    public static AccountManager getById(int id) {
+    public static ImmutableAccount getById(int id) {
         if (id < 0 || id >= mockAccountList.size())
             throw new NotFoundException(
                     new JsonError("Not found error", "An account with id: " + id + " is not found"));
-        return mockAccountList.get(id);
+        return new ImmutableAccount(mockAccountList.get(id));
     }
 
     public static class ImmutableAccount {
@@ -138,13 +131,12 @@ public class AccountManager {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             ImmutableAccount that = (ImmutableAccount) o;
-            return getId() == that.getId() &&
-                    Double.compare(that.getBalance(), getBalance()) == 0;
+            return getId() == that.getId();
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(getId(), getBalance());
+            return Objects.hash(getId());
         }
 
         private Account getAccount() {
@@ -160,7 +152,7 @@ public class AccountManager {
             this.id = id;
             this.balance = balance;
 
-            mockAccountList.add(new AccountManager(this));
+            mockAccountList.add(this);
         }
 
         private Account(double balance) {

@@ -12,7 +12,7 @@ public class AccountService {
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public AccountManager.ImmutableAccount getAccount(@PathParam("id") int id) {
-        return AccountManager.getAccount(id);
+        return AccountManager.getById(id);
     }
 
     @POST
